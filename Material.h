@@ -25,4 +25,61 @@ struct Material {
   float refractiveIndex = 1.f;
 };
 
+Material yellow_specular{
+    glm::vec3(0.1f, 0.10f, 0.0f),
+    glm::vec3(0.4f, 0.4f, 0.0f),
+    glm::vec3(1.0),
+    100.0
+};
+
+Material green_diffuse{
+    glm::vec3(0.03f, 0.1f, 0.03f),
+    glm::vec3(0.3f, 1.0f, 0.3f)
+};
+
+Material red_specular{
+    glm::vec3(0.01f, 0.02f, 0.02f),
+    glm::vec3(1.0f, 0.2f, 0.2f),
+    glm::vec3(0.5),
+    10.0
+};
+
+Material blue_specular{
+    glm::vec3(0.02f, 0.02f, 0.1f),
+    glm::vec3(0.1f, 0.1f, 0.1f),
+    glm::vec3(0.1),
+    100.0,
+    nullptr,
+    0.5f
+};
+
+Material refractive{
+    glm::vec3(0.02f, 0.02f, 0.1f),
+    glm::vec3(0.1f, 0.1f, 0.1f),
+    glm::vec3(0.1),
+    100.0,
+    nullptr,
+    0.25f,
+    true,
+    2.0f
+};
+
+Material textured{
+    glm::vec3(0.0),
+    glm::vec3(0.0),
+    glm::vec3(0.0),
+    0.0f,
+    &rainbowTexture
+};
+
+Material red_diffuse{
+    glm::vec3(0.09f, 0.06f, 0.06f),
+    glm::vec3(0.9f, 0.6f, 0.6f)
+};
+
+Material blue_diffuse{
+    glm::vec3(0.06f, 0.06f, 0.09f),
+    glm::vec3(0.6f, 0.6f, 0.9f)
+};
+
 #endif /* Material_h */

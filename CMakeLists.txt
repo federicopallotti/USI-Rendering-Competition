@@ -396,6 +396,7 @@ add_executable(USI_Rendering_Competition
         object/Sphere.h
         object/Plane.h
         object/Cone.h
+        Light.h
         Image.h
         main.cpp
         Material.h

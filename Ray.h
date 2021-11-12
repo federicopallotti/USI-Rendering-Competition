@@ -20,4 +20,5 @@ class Ray {
 
   }
 };
+
 #endif //TEMPLATE__RAY_H_
