@@ -177,7 +177,7 @@ void sceneDefinition() {
   objects.push_back(cone2);
 
   //Triangle
-  objects.push_back(new Triangle(glm::vec3(0.0f, 0.0f, 6.0f),glm::vec3(5.0f, 5.0f, 6.0f),glm::vec3(5.0f, 0.0f, 6.0f)));
+  objects.push_back(new Triangle(glm::vec3(0.0f, 0.0f, 6.0f),glm::vec3(5.0f, 0.0f, 6.0f),glm::vec3(5.0f, 5.0f, 6.0f)));
 }
 
 int main(int argc, const char *argv[]) {

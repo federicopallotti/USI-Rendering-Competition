@@ -13,7 +13,7 @@ public:
     {
         //compute plane passing by the 3 points
         //compute the normal to that plane
-        this->normal = -glm::normalize(glm::cross(v1 - v2, v3 - v2));
+        this->normal = glm::normalize(glm::cross(v1 - v2, v3 - v2));
     }
 
     //compute ray plane intersection to find P
