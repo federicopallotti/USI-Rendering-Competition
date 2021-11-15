@@ -13,6 +13,7 @@
 #include "object/Sphere.h"
 #include "object/Plane.h"
 #include "object/Cone.h"
+#include "object/Triangle.h"
 #include "Image.h"
 #include "Ray.h"
 #include "Light.h"
@@ -174,6 +175,9 @@ void sceneDefinition() {
   rotationMatrix = glm::rotate(glm::atan(3.0f), glm::vec3(0, 0, 1));
   cone2->setTransformation(translationMatrix * rotationMatrix * scalingMatrix);
   objects.push_back(cone2);
+
+  //Triangle
+  objects.push_back(new Triangle(glm::vec3(0.0f, 0.0f, 6.0f),glm::vec3(5.0f, 5.0f, 6.0f),glm::vec3(5.0f, 0.0f, 6.0f)));
 }
 
 int main(int argc, const char *argv[]) {
