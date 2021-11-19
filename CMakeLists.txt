@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(USI_Rendering_Competition)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 include_directories(.)
 include_directories(glm)
@@ -11,6 +11,7 @@ include_directories(glm/gtc)
 include_directories(glm/gtx)
 include_directories(glm/simd)
 include_directories(object)
+include_directories(thread-pool)
 
 add_executable(USI_Rendering_Competition
         glm/detail/_features.hpp
@@ -399,7 +400,9 @@ add_executable(USI_Rendering_Competition
         object/Triangle.h
         Light.h
         Image.h
+        kdtree.h
         main.cpp
         Material.h
         Ray.h
-        Textures.h)
+        Textures.h
+        thread-pool/thread_pool.hpp)

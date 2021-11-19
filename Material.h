@@ -82,4 +82,9 @@ Material blue_diffuse{
     glm::vec3(0.6f, 0.6f, 0.9f)
 };
 
+Material white_diffuse{
+    glm::vec3(1.0f, 1.0f, 1.0f),
+    glm::vec3(0.1f, 0.1f, 0.1f)
+};
+
 #endif /* Material_h */

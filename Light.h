@@ -39,6 +39,7 @@ void position_lights() {
   lights.push_back(new Light(glm::vec3(0, 26, 5), glm::vec3(1.0, 1.0, 1.0)));
   lights.push_back(new Light(glm::vec3(0, 1, 12), glm::vec3(0.1)));
   lights.push_back(new Light(glm::vec3(0, 5, 1), glm::vec3(0.4)));
+  lights.push_back(new Light(glm::vec3(0, 3, -11), glm::vec3(0.1)));
 }
 
 #endif //USI_RENDERING_COMPETITION__LIGHT_H_

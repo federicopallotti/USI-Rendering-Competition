@@ -6,9 +6,13 @@
 #include <fstream>
 #include <cmath>
 #include <ctime>
+#include <chrono>
 #include <vector>
+#include <thread>
+#include <mutex>
 #include "glm/glm.hpp"
 #include "glm/gtx/transform.hpp"
+#include "thread-pool/thread_pool.hpp"
 
 #include "object/Sphere.h"
 #include "object/Plane.h"
@@ -17,8 +21,13 @@
 #include "Image.h"
 #include "Ray.h"
 #include "Light.h"
+#include "kdtree.h"
+
+using std::chrono::system_clock;
 
 using namespace std;
+
+mutex mtx;
 
 vector<Object *> objects; ///< A list of all objects in the scene
 
@@ -152,14 +161,6 @@ void sceneDefinition() {
   //Textured sphere
   objects.push_back(new Sphere(7.0, glm::vec3(-6, 4, 23), textured));
 
-  objects.push_back(new Plane(glm::vec3(0, -3, 0), glm::vec3(0.0, 1, 0)));
-  objects.push_back(new Plane(glm::vec3(0, 1, 30), glm::vec3(0.0, 0.0, -1.0), green_diffuse));
-  objects.push_back(new Plane(glm::vec3(-15, 1, 0), glm::vec3(1.0, 0.0, 0.0), red_diffuse));
-  objects.push_back(new Plane(glm::vec3(15, 1, 0), glm::vec3(-1.0, 0.0, 0.0), blue_diffuse));
-  objects.push_back(new Plane(glm::vec3(0, 27, 0), glm::vec3(0.0, -1, 0)));
-  objects.push_back(new Plane(glm::vec3(0, 1, -0.01), glm::vec3(0.0, 0.0, 1.0), green_diffuse));
-
-
   // Cone
 
   Cone *cone = new Cone(yellow_specular);
@@ -177,18 +178,70 @@ void sceneDefinition() {
   objects.push_back(cone2);
 
   //Triangle
-  objects.push_back(new Triangle(glm::vec3(0.0f, 0.0f, 6.0f),glm::vec3(5.0f, 0.0f, 6.0f),glm::vec3(5.0f, 5.0f, 6.0f)));
+  objects.push_back(new Triangle(glm::vec3(0.0f, 0.0f, 6.0f),
+                                 glm::vec3(5.0f, 5.0f, 6.0f),
+                                 glm::vec3(5.0f, 0.0f, 6.0f)));
+}
+
+void planes() {
+  objects.push_back(new Plane(glm::vec3(0, -3, 0), glm::vec3(0.0, 1, 0)));
+  objects.push_back(new Plane(glm::vec3(0, 1, 30), glm::vec3(0.0, 0.0, -1.0), green_diffuse));
+  objects.push_back(new Plane(glm::vec3(-15, 1, 0), glm::vec3(1.0, 0.0, 0.0), red_diffuse));
+  objects.push_back(new Plane(glm::vec3(15, 1, 0), glm::vec3(-1.0, 0.0, 0.0), blue_diffuse));
+  objects.push_back(new Plane(glm::vec3(0, 27, 0), glm::vec3(0.0, -1, 0)));
+  objects.push_back(new Plane(glm::vec3(0, 1, -0.01), glm::vec3(0.0, 0.0, 1.0), green_diffuse));
+}
+
+void parse_to_triangles(const vector<point> &points) {
+  glm::mat4 translationMatrix = glm::translate(glm::vec3(0, 1.3, 3));
+  for (int i = 0; i < points.size(); i += 3) {
+    auto *triangle = new Triangle(points[i], points[i + 1], points[i + 2]);
+    triangle->setTransformation(translationMatrix);
+    objects.push_back(triangle);
+  }
+}
+
+void threading_test(int start, int end, int height, float X, float Y, float s, Image image) {
+  for (int i = start; i < end; i++)
+    for (int j = 0; j < height; j++) {
+
+      float dx = X + (float) i * s + s / 2;
+      float dy = Y - (float) j * s - s / 2;
+      float dz = 1;
+
+      glm::vec3 origin(0, 3, -10);
+      glm::vec3 direction(dx, dy, dz);
+      direction = glm::normalize(direction);
+
+      Ray ray(origin, direction);
+      glm::vec3 res = toneMapping(trace_ray(ray, 3, true));
+      image.setPixel(i, j, res);
+    }
 }
 
 int main(int argc, const char *argv[]) {
-
   clock_t t = clock(); // variable for keeping the time of the rendering
 
+//  int width = 2048; //width of the image
+//  int height = 1536; // height of the image
   int width = 1024; //width of the image
   int height = 768; // height of the image
-  float fov = 90; // field of view
+//  int width = 512; //width of the image
+//  int height = 384; // height of the image
 
-  sceneDefinition(); // Let's define a scene
+  float fov = 90; // field of view
+  if (argc == 2) {
+    vector<point> points = parseFile(argv[1]);
+    parse_to_triangles(points);
+  }
+
+  t = clock() - t;
+  cout << "It took " << ((float) t) / CLOCKS_PER_SEC << " seconds to load the mesh." << endl;
+  time_t timet = system_clock::to_time_t(system_clock::now());
+  struct tm *time = localtime(&timet);
+  cout << "Current time: " << put_time(time, "%X") << '\n';
+//  sceneDefinition(); // Let's define a scene
+  planes();
   position_lights();
 
   Image image(width, height); // Create an image where we will store the result
@@ -196,34 +249,28 @@ int main(int argc, const char *argv[]) {
   auto s = (float) (2 * tan(0.5 * fov / 180 * M_PI) / width);
   auto X = (float) (-s * (float) width / 2.0);
   auto Y = (float) (s * (float) height / 2.0);
+  uint n = thread::hardware_concurrency()*2;
+  uint slice = floor(width / n);
+  int x = 0;
+  thread_pool pool;
+  for (uint i = 0; i < n; i++, x++) {
+    pool.push_task(threading_test, slice * x, slice * (x + 1), height, X, Y, s, ref(image));
+  }
+  pool.push_task(threading_test, slice * x, width, height, X, Y, s, ref(image));
+  pool.wait_for_tasks();
 
-  for (int i = 0; i < width; i++)
-    for (int j = 0; j < height; j++) {
 
-      float dx = X + (float) i * s + s / 2;
-      float dy = Y - (float) j * s - s / 2;
-      float dz = 1;
-
-      glm::vec3 origin(0, 0, 0);
-      glm::vec3 direction(dx, dy, dz);
-      direction = glm::normalize(direction);
-
-      Ray ray(origin, direction);
-
-      image.setPixel(i, j, toneMapping(trace_ray(ray, 3, true)));
-
-    }
-
-  t = clock() - t;
-  cout << "It took " << ((float) t) / CLOCKS_PER_SEC << " seconds to render the image." << endl;
-  cout << "I could render at " << (float) CLOCKS_PER_SEC / ((float) t) << " frames per second." << endl;
+  timet = system_clock::to_time_t(system_clock::now());
+  //convert it to tm struct
+  time = std::localtime(&timet);
+  cout << "Current time: " << put_time(time, "%X") << '\n';
 
   // Writing the final results of the rendering
-  if (argc == 2) {
+  if (argc == 3) {
     image.writeImage(argv[2]);
   } else {
     image.writeImage("./result.ppm");
   }
-
+//  test();
   return 0;
 }
