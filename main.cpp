@@ -22,6 +22,8 @@
 #include "Ray.h"
 #include "Light.h"
 #include "kdtree.h"
+#include <math.h>
+#include <random>
 
 using std::chrono::system_clock;
 
@@ -100,11 +102,13 @@ glm::vec3 trace_ray(Ray ray, int depth, bool outside) {
   glm::vec3 refract_color(0.0f);
 
   if (depth > 0 && closest_hit.hit) {
+
     if (closest_hit.object->getMaterial().refract) {
       float Fr;
       float Ft;
       float delta1 = 1.0f;
       float delta2 = closest_hit.object->getMaterial().refractiveIndex;
+
 
       float beta = 1.0f / closest_hit.object->getMaterial().refractiveIndex;
       glm::vec3 refraction_direction = glm::normalize(glm::refract(ray.direction, closest_hit.normal, beta));
@@ -136,6 +140,7 @@ glm::vec3 trace_ray(Ray ray, int depth, bool outside) {
           reflection_alpha * trace_ray(reflect_ray, depth - 1, true),
           glm::vec3(0.0f), glm::vec3(1.0f));
     }
+
 
     color = glm::clamp(PhongModel(closest_hit.intersection, closest_hit.normal, closest_hit.uv,
                                   glm::normalize(-ray.direction), closest_hit.object->getMaterial()),
@@ -202,30 +207,47 @@ void parse_to_triangles(const vector<point> &points) {
 }
 
 void threading_test(int start, int end, int height, float X, float Y, float s, Image image) {
-  for (int i = start; i < end; i++)
-    for (int j = 0; j < height; j++) {
+    for (int i = start; i < end; i++)
+        for (int j = 0; j < height; j++) {
 
-      float dx = X + (float) i * s + s / 2;
-      float dy = Y - (float) j * s - s / 2;
-      float dz = 1;
+            float dx = X + (float) i * s + s / 2;
+            float dy = Y - (float) j * s - s / 2;
+            float dz = 1;
 
-      glm::vec3 origin(0, 3, -10);
-      glm::vec3 direction(dx, dy, dz);
-      direction = glm::normalize(direction);
+            glm::vec3 origin(0, 0, 0);
+            glm::vec3 direction(dx, dy, dz);
+            direction = glm::normalize(direction);
+            Ray ray(origin, direction);
 
-      Ray ray(origin, direction);
-      glm::vec3 res = toneMapping(trace_ray(ray, 3, true));
-      image.setPixel(i, j, res);
-    }
+            //code for DOF effect
+
+            //DOF parameters
+            float f = 8.0; //focal dist
+            float r = 0.3f; //aperture
+            float n = 30.f; //num of samples
+            glm::vec3 focal_p = f * ray.direction / ray.direction.z;
+            glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
+
+            for (int i = 0; i < n; i++) {
+                float offset_x = r * (((float)(rand()%RAND_MAX))/(float)RAND_MAX)*2.f-1.f;
+                float offset_y = r * (((float)(rand()%RAND_MAX))/(float)RAND_MAX)*2.f-1.f;
+                glm::vec3 new_o = ray.origin + glm::vec3(offset_x, offset_y, 0.0);
+                glm::vec3 new_d = glm::normalize(focal_p - new_o);
+                Ray new_ray(new_o, new_d);
+                color += toneMapping(trace_ray(new_ray, 3, true));
+            }
+            glm::vec3 res = color/n;
+            image.setPixel(i, j, res);
+        }
 }
 
 int main(int argc, const char *argv[]) {
   clock_t t = clock(); // variable for keeping the time of the rendering
 
-//  int width = 2048; //width of the image
-//  int height = 1536; // height of the image
-  int width = 1024; //width of the image
-  int height = 768; // height of the image
+  int width = 2048; //width of the image
+  int height = 1536; // height of the image
+//  int width = 1024; //width of the image
+//  int height = 768; // height of the image
 //  int width = 512; //width of the image
 //  int height = 384; // height of the image
 
@@ -240,7 +262,7 @@ int main(int argc, const char *argv[]) {
   time_t timet = system_clock::to_time_t(system_clock::now());
   struct tm *time = localtime(&timet);
   cout << "Current time: " << put_time(time, "%X") << '\n';
-//  sceneDefinition(); // Let's define a scene
+  sceneDefinition(); // Let's define a scene
   planes();
   position_lights();
 
@@ -258,6 +280,58 @@ int main(int argc, const char *argv[]) {
   }
   pool.push_task(threading_test, slice * x, width, height, X, Y, s, ref(image));
   pool.wait_for_tasks();
+//    random_device rd;
+//    mt19937 gen(rd());
+//    uniform_int_distribution<float> uniform_dist(0.2,2.2);
+//    float mean = uniform_dist(rd);
+//    normal_distribution<> normal_dist(mean,2);
+//    for (int i = 0; i < width; i++)
+//        for (int j = 0; j < height; j++) {
+//
+//            float dx = X + (float) i * s + s / 2;
+//            float dy = Y - (float) j * s - s / 2;
+//            float dz = 1;
+//
+//            glm::vec3 origin(0, 0, 0);
+//            glm::vec3 direction(dx, dy, dz);
+//            direction = glm::normalize(direction);
+//            Ray ray(origin, direction);
+//
+//            //code for DOF effect
+//
+//            //DOF parameters
+//            float f = 3.0; //focal dist
+//            float r = 0.2; //aperture
+//            float n = 4.f; //num of samples
+//            glm::vec3 focal_p = f * ray.direction / ray.direction.z;
+//            glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
+//
+//            for (int i = 0; i < n; i++) {
+//                r = r * sqrt(random());
+//                //cout << "r value:" << r <<endl;
+//                float theta = random() * 2 * M_PI;
+//                float offset_x = r * cos(theta);
+//                //cout << "x value:" << offset_x<< endl;
+//                float offset_y = r * sin(theta);
+//                //cout << "y value:" << offset_y<< endl;
+//                glm::vec3 new_o = ray.origin + glm::vec3(offset_x, offset_y, 0.0);
+//                glm::vec3 new_d = glm::normalize(focal_p - new_o);
+////                cout << "origin x:" << new_o.x<< endl;
+////                cout << "origin y" << new_o.y<< endl;
+////                cout << "origin z:" << new_o.z<< endl;
+//                cout << "dir x:" << new_d.x<< endl;
+//                cout << "dir y:" << new_d.y<< endl;
+//                cout << "dir z:" << new_d.z<< endl;
+//                //cout << "direction:" << new_d<< endl;
+//                Ray new_ray(new_o, new_d);
+//                color += trace_ray(new_ray, 3, true);
+//                //cout << "r value:" << color.r/n<< endl;
+////                cout << "g value:" << color.g/n<< endl;
+////                cout << "b value:" << color.b/n<< endl;
+//                glm::vec3 res = toneMapping(color / n);
+//                image.setPixel(i, j, res);
+//            }
+//        }
 
 
   timet = system_clock::to_time_t(system_clock::now());
