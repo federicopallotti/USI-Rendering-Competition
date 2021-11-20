@@ -213,19 +213,24 @@ void threading_test(int start, int end, int height, float X, float Y, float s, I
             float dx = X + (float) i * s + s / 2;
             float dy = Y - (float) j * s - s / 2;
             float dz = 1;
-
+            float sp = 0.5f*s;
             glm::vec3 origin(0, 0, 0);
             glm::vec3 direction(dx, dy, dz);
+            glm::vec3 direction1(dx+sp, dy, dz);
+            glm::vec3 direction2(dx, dy+sp, dz);
+            glm::vec3 direction3(dx+sp, dy+sp, dz);
             direction = glm::normalize(direction);
             Ray ray(origin, direction);
 
             //code for DOF effect
-
             //DOF parameters
             float f = 8.0; //focal dist
             float r = 0.3f; //aperture
             float n = 30.f; //num of samples
             glm::vec3 focal_p = f * ray.direction / ray.direction.z;
+            glm::vec3 focal_p1 = f * direction1 / direction1.z;
+            glm::vec3 focal_p2 = f * direction2 / direction2.z;
+            glm::vec3 focal_p3 = f * direction3 / direction3.z;
             glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
 
             for (int i = 0; i < n; i++) {
@@ -233,8 +238,21 @@ void threading_test(int start, int end, int height, float X, float Y, float s, I
                 float offset_y = r * (((float)(rand()%RAND_MAX))/(float)RAND_MAX)*2.f-1.f;
                 glm::vec3 new_o = ray.origin + glm::vec3(offset_x, offset_y, 0.0);
                 glm::vec3 new_d = glm::normalize(focal_p - new_o);
-                Ray new_ray(new_o, new_d);
-                color += toneMapping(trace_ray(new_ray, 3, true));
+                glm::vec3 new_d1 = glm::normalize(focal_p1 - new_o);
+                glm::vec3 new_d2 = glm::normalize(focal_p2 - new_o);
+                glm::vec3 new_d3 = glm::normalize(focal_p3 - new_o);
+
+//                Ray new_ray(new_o, new_d);
+                Ray ray1(new_o,new_d);
+                Ray ray2(new_o,new_d1);
+                Ray ray3(new_o,new_d2);
+                Ray ray4(new_o,new_d3);
+                glm::vec3 color_local = glm::vec3(0.0f, 0.0f, 0.0f);
+                color_local += toneMapping(trace_ray(ray1, 3, true));
+                color_local += toneMapping(trace_ray(ray2, 3, true));
+                color_local += toneMapping(trace_ray(ray3, 3, true));
+                color_local += toneMapping(trace_ray(ray4, 3, true));
+                color += color_local/4.0f;
             }
             glm::vec3 res = color/n;
             image.setPixel(i, j, res);
