@@ -64,6 +64,25 @@ Material refractive{
     2.0f
 };
 
+Material refractive_light{
+    glm::vec3(0.02f, 0.02f, 0.1f),
+    glm::vec3(0.1f, 0.1f, 0.1f),
+    glm::vec3(0.1),
+    30.0,
+    nullptr,
+    0.5f,
+    true,
+    5.0f
+};
+
+Material perlinTexture{
+    glm::vec3(0.0),
+    glm::vec3(0.0),
+    glm::vec3(0.0),
+    0.0f,
+    &perlinNoise
+};
+
 Material textured{
     glm::vec3(0.0),
     glm::vec3(0.0),

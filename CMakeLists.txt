@@ -398,11 +398,12 @@ add_executable(USI_Rendering_Competition
         object/Plane.h
         object/Cone.h
         object/Triangle.h
+        object/Figure.h
         Light.h
         Image.h
-        kdtree.h
         main.cpp
         Material.h
         Ray.h
         Textures.h
+        PerlinNoise.h
         thread-pool/thread_pool.hpp)

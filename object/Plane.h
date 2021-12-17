@@ -36,6 +36,13 @@ class Plane : public Object {
         hit.distance = t;
         hit.object = this;
         hit.intersection = t * ray.direction + ray.origin;
+        glm::vec3 el1 = glm::normalize(glm::cross(normal, glm::vec3(1.f, 0.f, 0.f)));
+        if (el1 == glm::vec3(0)){
+          el1 = glm::normalize(glm::cross(normal, glm::vec3(0.f, 0.f, 1.f)));
+        }
+        glm::vec3 el2 = glm::normalize(glm::cross(normal, el1));
+        hit.uv.s = glm::dot(el1,hit.intersection);
+        hit.uv.t = glm::dot(el2,hit.intersection);
       }
     }
     return hit;

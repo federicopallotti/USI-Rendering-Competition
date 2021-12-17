@@ -3,22 +3,20 @@
 class Triangle : public Object {
  protected:
   const float EPSILON = 0.0000001;
- private:
+ public:
   glm::vec3 v1{};
   glm::vec3 v2{};
   glm::vec3 v3{};
   glm::vec3 normal{};
   glm::vec3 e1{};
   glm::vec3 e2{};
-
- public:
   Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3) : v1(v1), v2(v2), v3(v3) {
     this->e1 = this->v2 - this->v1;
     this->e2 = this->v3 - this->v1;
     this->normal = glm::normalize(glm::cross(this->e1, this->e2));
   }
 
-  Triangle(const std::vector<float> &v1, const std::vector<float> &v2, const std::vector<float> &v3) {
+  Triangle(std::vector<float> v1, std::vector<float> v2, std::vector<float> v3) {
     this->v1 = glm::vec3(v1[0], v1[1], v1[2]);
     this->v2 = glm::vec3(v2[0], v2[1], v2[2]);
     this->v3 = glm::vec3(v3[0], v3[1], v3[2]);
@@ -77,41 +75,5 @@ class Triangle : public Object {
 
     // No hit at all
     return hit;
-
-//    float DdotN = glm::dot(ray.direction, this->normal);
-//    if (DdotN > -EPSILON && DdotN < EPSILON)
-//      return hit;
-//    float PdotN = glm::dot(v1 - ray.origin, this->normal);
-//    float t = PdotN / DdotN;
-//    if (t < EPSILON)
-//      return hit;
-//    glm::vec3 p = t * ray.direction + ray.origin;
-//    //compute areas of the 3 triangles with dot prod
-//    float a1 = glm::length(glm::cross(v1 - p, v2 - p)) / 2.f;
-//    float a2 = glm::length(glm::cross(v2 - p, v3 - p)) / 2.f;
-//    float a3 = glm::length(glm::cross(v1 - p, v3 - p)) / 2.f;
-//    float a = glm::length(glm::cross(v2 - v1, v3 - v1)) / 2.f;
-//
-//    //compute lambdas
-//
-//    float lambda1 = a1 / a;
-//    float lambda2 = a2 / a;
-//    float lambda3 = a3 / a;
-//
-//    //check if all lambdas are positive
-//
-//    if (lambda1 > 0 && lambda2 > 0 && lambda3 > 0 && (lambda1 + lambda2 + lambda3) <= 1.001
-//        && (lambda1 + lambda2 + lambda3) >= 0.99) {
-//      //set intersection to true
-//      hit.hit = true;
-//      hit.object = this;
-//      hit.intersection = p;
-//      hit.distance = t;
-//      hit.normal = normal;
-//      return hit;
-//    }
-//
-//    return hit;
-
   }
 };
