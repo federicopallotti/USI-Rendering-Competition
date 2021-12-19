@@ -40,7 +40,7 @@ glm::vec3 PhongModel(glm::vec3 point, glm::vec3 normal, glm::vec2 uv, glm::vec3 
   glm::vec3 color(0.0);
   for (auto &light_g: soft_lights) {
     glm::vec3 local_color(0.0);
-    for(auto &light: light_g){
+    for (auto &light: light_g) {
       glm::vec3 light_direction = glm::normalize(light->position - point);
       glm::vec3 reflected_direction = glm::reflect(-light_direction, normal);
 
@@ -49,6 +49,9 @@ glm::vec3 PhongModel(glm::vec3 point, glm::vec3 normal, glm::vec2 uv, glm::vec3 
 
       glm::vec3 diffuse_color = material.diffuse;
       if (material.texture) diffuse_color = material.texture(uv);
+      if (material.texture == perlinNoise) {
+        NdotL = glm::dot(material.texture(uv), light_direction);
+      }
 
       glm::vec3 diffuse = diffuse_color * glm::vec3(NdotL);
       glm::vec3 specular = material.specular * glm::vec3(pow(VdotR, material.shininess));
@@ -71,7 +74,7 @@ glm::vec3 PhongModel(glm::vec3 point, glm::vec3 normal, glm::vec2 uv, glm::vec3 
       if (sj != 0.f)
         local_color += light->color * (diffuse + specular) / r / r;
     }
-    color += local_color/(float)light_g.size();
+    color += local_color / (float) light_g.size();
   }
   color += ambient_light * material.ambient;
   color = glm::clamp(color, glm::vec3(0.0), glm::vec3(1.0));
@@ -185,8 +188,8 @@ void sceneDefinition() {
 }
 
 void planes() {
-  objects.push_back(new Plane(glm::vec3(0, -3, 0), glm::vec3(0.0, 1, 0),perlinTexture));
-  objects.push_back(new Plane(glm::vec3(0, 1, 30), glm::vec3(0.0, 0.0, -1.0), perlinTexture));
+  objects.push_back(new Plane(glm::vec3(0, -3, 0), glm::vec3(0.0, 1, 0), perlinTexture));
+  objects.push_back(new Plane(glm::vec3(0, 1, 30), glm::vec3(0.0, 0.0, -1.0), green_diffuse));
   objects.push_back(new Plane(glm::vec3(-15, 1, 0), glm::vec3(1.0, 0.0, 0.0), red_diffuse));
   objects.push_back(new Plane(glm::vec3(15, 1, 0), glm::vec3(-1.0, 0.0, 0.0), blue_diffuse));
   objects.push_back(new Plane(glm::vec3(0, 27, 0), glm::vec3(0.0, -1, 0)));
@@ -245,10 +248,10 @@ void threading_test(int start, int end, int height, float X, float Y, float s, I
         Ray ray4(new_o, new_d3);
         glm::vec3 color_local = glm::vec3(0.0f, 0.0f, 0.0f);
         color_local += toneMapping(trace_ray(ray1, 3, true));
-//                color_local += toneMapping(trace_ray(ray2, 3, true));
-//                color_local += toneMapping(trace_ray(ray3, 3, true));
-//                color_local += toneMapping(trace_ray(ray4, 3, true));
-        color += color_local / 1.0f;
+        color_local += toneMapping(trace_ray(ray2, 3, true));
+        color_local += toneMapping(trace_ray(ray3, 3, true));
+        color_local += toneMapping(trace_ray(ray4, 3, true));
+        color += color_local /4.0f;
       }
       glm::vec3 res = color / n;
       image.setPixel(i, j, res);
@@ -266,10 +269,11 @@ int main(int argc, const char *argv[]) {
 //  int height = 384; // height of the image
 
   float fov = 90; // field of view
-  if (argc == 2) {
-//    vector<point> points =
-    objects.push_back(new Figure(argv[1]));
-//    parse_to_triangles(points);
+  if (argc >= 2) {
+    objects.push_back(new Figure(argv[1],true));
+  }
+  if (argc >= 3){
+    objects.push_back(new Figure(argv[2],false));
   }
 
   t = clock() - t;
@@ -277,8 +281,8 @@ int main(int argc, const char *argv[]) {
   time_t timet = system_clock::to_time_t(system_clock::now());
   struct tm *time = localtime(&timet);
   cout << "Current time: " << put_time(time, "%X") << '\n';
-  sceneDefinition(); // Let's define a scene
-  planes();
+//  sceneDefinition(); // Let's define a scene
+//  planes();
   position_lights();
 
   Image image(width, height); // Create an image where we will store the result

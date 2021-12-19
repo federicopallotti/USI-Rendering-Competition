@@ -14,8 +14,8 @@ class PerlinNoise {
 
   vector<int> permutation;
  public:
-  explicit PerlinNoise(u_int64_t seed = 237) {
-    permutation.resize(256);
+  explicit PerlinNoise(u_int64_t seed = 237,u_int64_t size = 512) {
+    permutation.resize(size/2);
     iota(permutation.begin(), permutation.end(), 0);
     default_random_engine engine(seed);
     shuffle(permutation.begin(), permutation.end(), engine);
@@ -23,9 +23,9 @@ class PerlinNoise {
   }
   double noise(double x, double y, double z) {
     // Find the unit cube that contains the point
-    int X = (int) floor(x) & 255;
-    int Y = (int) floor(y) & 255;
-    int Z = (int) floor(z) & 255;
+    int X = (int) floor(x) & (permutation.size()/2)-1;
+    int Y = (int) floor(y) & (permutation.size()/2)-1;
+    int Z = (int) floor(z) & (permutation.size()/2)-1;
 
     // Find relative x, y,z of point in cube
     x -= floor(x);

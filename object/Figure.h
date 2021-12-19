@@ -6,6 +6,7 @@
 #define USI_RENDERING_COMPETITION_OBJECT_FIGURE_H_
 #include "Object.h"
 #include "Triangle.h"
+#include "PerlinNoise.h"
 #include <utility>
 #include <vector>
 #include <stdexcept>
@@ -37,13 +38,30 @@ class Node {
 class Figure : public Object {
  private:
   Node *tree;
-  vector<Triangle *> parse_to_triangles(const vector<point> &points) {
+  vector<Triangle *> parse_to_triangles(const vector<point> &points, bool flag) {
+    PerlinNoise np;
     vector<Triangle *> triangles;
-    glm::mat4 translationMatrix = glm::translate(glm::vec3(0, 1.3, 3));
-    for (int i = 0; i < points.size(); i += 3) {
-      auto *triangle = new Triangle(points[i], points[i + 1], points[i + 2]);
-      triangle->setTransformation(translationMatrix);
-      triangles.push_back(triangle);
+    if (flag) {
+      glm::mat4 translationMatrix = glm::translate(glm::vec3(0, 0, 1));
+      for (int i = 0; i < points.size(); i += 3) {
+        point v1 = points[i];
+        point v2 = points[i + 1];
+        point v3 = points[i + 2];
+        v1[1] += (float) np.noise(v1[0], v1[1], v1[2]);
+        v2[1] += (float) np.noise(v2[0], v2[1], v2[2]);
+        v3[1] += (float) np.noise(v3[0], v3[1], v3[2]);
+        auto *triangle = new Triangle(v1, v2, v3);
+        triangle->setTransformation(translationMatrix);
+        triangle->setMaterial(blue_specular);
+        triangles.push_back(triangle);
+      }
+    } else {
+      glm::mat4 translationMatrix = glm::translate(glm::vec3(0, 1.3, 3));
+      for (int i = 0; i < points.size(); i += 3) {
+        auto *triangle = new Triangle(points[i], points[i + 1], points[i + 2]);
+        triangle->setTransformation(translationMatrix);
+        triangles.push_back(triangle);
+      }
     }
     return triangles;
   }
@@ -80,7 +98,7 @@ class Figure : public Object {
     tree = node_tree(triangles, 0, (int) triangles.size());
   }
  public:
-  Figure(const string &name) {
+  Figure(const string &name, bool flag) {
     ifstream myfile;
     myfile.open(name);
     char v;
@@ -107,7 +125,7 @@ class Figure : public Object {
       }
       myfile.close();
     }
-    vector<Triangle *> triangles = parse_to_triangles(ret_points);
+    vector<Triangle *> triangles = parse_to_triangles(ret_points, flag);
     kdtree(triangles);
   }
 

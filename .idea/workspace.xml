@@ -15,17 +15,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4361e9b7-e8f9-4c34-b96a-5799c6a6eee7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/object/Figure.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Light.h" beforeDir="false" afterPath="$PROJECT_DIR$/Light.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Material.h" beforeDir="false" afterPath="$PROJECT_DIR$/Material.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Ray.h" beforeDir="false" afterPath="$PROJECT_DIR$/Ray.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PerlinNoise.h" beforeDir="false" afterPath="$PROJECT_DIR$/PerlinNoise.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Textures.h" beforeDir="false" afterPath="$PROJECT_DIR$/Textures.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kdtree.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/object/Plane.h" beforeDir="false" afterPath="$PROJECT_DIR$/object/Plane.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/object/Triangle.h" beforeDir="false" afterPath="$PROJECT_DIR$/object/Triangle.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/object/Figure.h" beforeDir="false" afterPath="$PROJECT_DIR$/object/Figure.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,18 +73,13 @@
       <recent name="$PROJECT_DIR$/cmake-build-debug" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.USI_Rendering_Competition">
+  <component name="RunManager" selected="CMake Application.USI_Rendering_Competition pupino">
     <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="USI_Rendering_Competition pupino" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="$ContentRoot$/untitled.obj" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="USI_Rendering_Competition" TARGET_NAME="USI_Rendering_Competition" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="USI_Rendering_Competition" RUN_TARGET_NAME="USI_Rendering_Competition">
+    <configuration name="USI_Rendering_Competition pupino" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="$ContentRoot$/Plane_hhr.obj" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="USI_Rendering_Competition" TARGET_NAME="USI_Rendering_Competition" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="USI_Rendering_Competition" RUN_TARGET_NAME="USI_Rendering_Competition">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -120,7 +110,10 @@
       <workItem from="1639485155108" duration="14802000" />
       <workItem from="1639640813135" duration="1792000" />
       <workItem from="1639642994309" duration="9821000" />
-      <workItem from="1639734455995" duration="2654000" />
+      <workItem from="1639734455995" duration="3011000" />
+      <workItem from="1639748401103" duration="6863000" />
+      <workItem from="1639768671216" duration="544000" />
+      <workItem from="1639911573332" duration="3758000" />
     </task>
     <servers />
   </component>

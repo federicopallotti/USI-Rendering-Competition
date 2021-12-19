@@ -11,6 +11,11 @@
 #include "glm/glm.hpp"
 #include "PerlinNoise.h"
 
+PerlinNoise pn;
+PerlinNoise pn1(2016, 1024);
+PerlinNoise pn2(310, 2048);
+PerlinNoise pn3(120412, 4096);
+
 glm::vec3 checkerboardTexture(glm::vec2 uv) {
   float n = 20;
   float value = int(floor(n * uv.s) + floor(2 * n * uv.t)) % 2;
@@ -29,8 +34,14 @@ glm::vec3 rainbowTexture(glm::vec2 uv) {
 }
 
 glm::vec3 perlinNoise(glm::vec2 uv) {
-  PerlinNoise pn;
-  return glm::vec3((float) pn.noise(uv.x, uv.y, 1.0));
+  float n1 = (float) (pn.noise(uv.x, uv.y, 1.0) +
+      pn1.noise(uv.x, uv.y, 1.0) +
+      pn2.noise(uv.x, uv.y, 1.0) +
+      pn3.noise(uv.x, uv.y, 1.0)) / 4.f;
+  float n2 = (float) (pn.noise(uv.x, uv.y, 1.0) +
+      pn1.noise(uv.x, uv.y, 1.0)) / 4.f;
+  float n3 = (float) (pn.noise(uv.x, uv.y, 1.0)) / 4.f;
+  return glm::normalize(glm::vec3((float) pn3.noise(uv.x, uv.y, 1.0)));
 }
 
 #endif /* Textures_h */

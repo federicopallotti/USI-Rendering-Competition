@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(USI_Rendering_Competition)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "-O3")
 
 include_directories(.)
 include_directories(glm)
